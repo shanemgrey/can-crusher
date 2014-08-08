@@ -6,7 +6,7 @@
 
 // Diameter of the fillet, radius of the roundover, length of the surface
 // rotate (a=[90,0,0])
-//filletRadius (9.6, 9.6/2, 100);
+ //filletRadius (9.6, 9.6/2, 100);
 module filletRadius (dia, rad, length) {
   union () {
     
@@ -27,10 +27,10 @@ module filletRadius (dia, rad, length) {
     // Cylinders Hulled
     rotate (a=[90,180,270])
     hull() {
-      translate ([rad+dia/2,dia/2,0])
-        cylinder(h=length-rad*2,r=dia/2);
-      translate ([rad+dia/2,-dia/2,0])
-        cylinder(h=length-rad*2,r=dia/2);
+      translate ([rad+dia/2,dia/2,-0.5])
+        cylinder(h=length-rad*2+1,r=dia/2);
+      translate ([rad+dia/2,-dia/2,-0.5])
+        cylinder(h=length-rad*2+1,r=dia/2);
     }
     
     // Other Quarter Taurus

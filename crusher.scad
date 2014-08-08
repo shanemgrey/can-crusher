@@ -41,8 +41,8 @@ rods = [
 
 // guidePlate ();
 
-//print ();
-viewOpen ();
+print ();
+// viewOpen ();
 // viewClosed ();
 
 module print () {
