@@ -1,6 +1,7 @@
 // Can Crusher
 
 include <fillets.scad>;
+include <handle.scad>;
 // Enter paramaters, view for accuracy in open and closed mode,
 // then use print mode for positioning for print.
 
@@ -9,7 +10,7 @@ include <fillets.scad>;
 // ********** //
 
 // Measured dimensions of wood used for attaching to guide plates.
-woodDimensions = [100, 100, 20];
+woodDims = [100, 100, 20];
 
 // Measure thickness of bolts used for pivot joints
 jointBoltThickness = 9.6; 
@@ -19,7 +20,7 @@ guidePlateThickness = jointBoltThickness/2;
 
 guidePostHeight = jointBoltThickness*2.5;
 
-assemblyThickness = woodDimensions[2] + guidePlateThickness + guidePostHeight;
+assemblyThickness = woodDims[2] + guidePlateThickness + guidePostHeight;
 
 // Can Height and radius
 // canSize = [122.7, 33.1];  // 12 oz
@@ -29,10 +30,10 @@ rodThicknesses = [9.6, 9.6, 9.6, 9.6];
 rodLengths = [260, 260, 260, 260];
 // Rod Positions x, y and measured radius, length
 rods = [
-    [12.1, (woodDimensions[0]-canSize[1]*2)/2, rodThicknesses[0], rodLengths[0]],
-    [87.9, (woodDimensions[0]-canSize[1]*2)/2, rodThicknesses[1], rodLengths[1]],
-    [79.5, woodDimensions[0]-((woodDimensions[0]-canSize[1]*2)/2), rodThicknesses[1], rodLengths[1]],
-    [20.5, woodDimensions[0]-((woodDimensions[0]-canSize[1]*2)/2), rodThicknesses[0], rodLengths[0]],
+    [12.1, (woodDims[0]-canSize[1]*2)/2, rodThicknesses[0], rodLengths[0]],
+    [87.9, (woodDims[0]-canSize[1]*2)/2, rodThicknesses[1], rodLengths[1]],
+    [79.5, woodDims[0]-((woodDims[0]-canSize[1]*2)/2), rodThicknesses[1], rodLengths[1]],
+    [20.5, woodDims[0]-((woodDims[0]-canSize[1]*2)/2), rodThicknesses[0], rodLengths[0]],
 ];  
 
 // ************* //
@@ -41,22 +42,35 @@ rods = [
 
 // guidePlate ();
 
-print ();
-// viewOpen ();
+// printTop ();
+// printBottom ();
+viewOpen ();
 // viewClosed ();
 
-module print () {
+module printTop () {
     guidePlate ();
-    rodsPositioned();
+}
+
+module printBottom () {
     mirror ([1,0,0])
     translate ([4, 0, 0])
     guidePlate ();
 }
 
 module viewOpen () {
-    // Bottom Assembly and Can
-    // translate ([woodDimensions[0]/2,woodDimensions[1]/2,woodDimensions[2]])
-    translate ([woodDimensions[0]/2,woodDimensions[1]/2,woodDimensions[2]])
+    translate ([0,(woodDims[1]*1.5),rodLengths[0]-guidePostHeight])
+    rotate(a = [0,90,270])
+    backPlane();
+
+    translate ([-woodDims[2]/2, -rodLengths[0]/2 + woodDims[1]/2, 40 + canSize[0]])
+    rotate (a=[90, 0, 90])
+    handleArm (rodLengths[0]*1.5, 20, 20, 10);
+
+    translate ([woodDims[0] + woodDims[2]/2, -rodLengths[0]/2 + woodDims[1]/2, 40 + canSize[0]])
+    rotate (a=[90, 0, 90])
+    handleArm (rodLengths[0]*1.5, 20, 20, 10);
+
+    translate ([woodDims[0]/2,woodDims[1]/2,woodDims[2]])
     can(canSize[0],canSize[1], $fn = 25);
     translate ([0, 0, 40 + canSize[0]])
     plateAssembly ();
@@ -67,9 +81,9 @@ module viewOpen () {
 
 module viewClosed () {
   canSize= ([30, 33.1]);
-    translate ([woodDimensions[0]/2,woodDimensions[1]/2,woodDimensions[2]])
+    translate ([woodDims[0]/2,woodDims[1]/2,woodDims[2]])
     can();
-    translate ([0, 0, woodDimensions[2] + canSize[0]])
+    translate ([0, 0, woodDims[2] + canSize[0]])
     plateAssembly ();
     mirror ([0,0,1])
     plateAssembly ();
@@ -87,11 +101,11 @@ module plateAssembly () {
 module rodsPositioned (rods) {
     color ("LightCyan")
     for (rod=rods)
-      translate ([rod[0], rod[1], -(assemblyThickness - woodDimensions[2]) ])
+      translate ([rod[0], rod[1], -(assemblyThickness - woodDims[2]) ])
       cylinder(rod[3], rod[2]/2, rod[2]/2, $fn=50);
 }
 
-module guidePlate (dim = [woodDimensions[0],woodDimensions[1], guidePlateThickness]) {
+module guidePlate (dim = [woodDims[0],woodDims[1], guidePlateThickness]) {
   color("red")
   difference () {
     union() {
@@ -102,9 +116,9 @@ module guidePlate (dim = [woodDimensions[0],woodDimensions[1], guidePlateThickne
       translate([rod[0], rod[1], guidePlateThickness-1])
       rodGuide (guidePostHeight, rod[2]*1.5/2, rod[2]/2);
 
-    translate([woodDimensions[0]/2, woodDimensions[0]/2-jointBoltThickness*2, guidePlateThickness])
+    translate([woodDims[0]/2, woodDims[0]/2-jointBoltThickness*2, guidePlateThickness])
     rotate (a = [270,0,0])
-     plateHinge (jointBoltThickness, guidePlateThickness, woodDimensions[0]) ;
+     plateHinge (jointBoltThickness, guidePlateThickness, woodDims[0]) ;
     
     }
     union () {
@@ -112,10 +126,10 @@ module guidePlate (dim = [woodDimensions[0],woodDimensions[1], guidePlateThickne
         translate([rod[0], rod[1], guidePlateThickness-1])
         cylinder(h=guidePlateThickness*5, r=rod[2]/2, center=true);
 
-        translate([woodDimensions[0]/2, woodDimensions[1]/5, guidePlateThickness-1])
+        translate([woodDims[0]/2, woodDims[1]/5, guidePlateThickness-1])
         cylinder(h=guidePlateThickness*5, r=1, center=true);
 
-        translate([woodDimensions[0]/2, woodDimensions[1]-woodDimensions[1]/5, guidePlateThickness-1])
+        translate([woodDims[0]/2, woodDims[1]-woodDims[1]/5, guidePlateThickness-1])
         cylinder(h=guidePlateThickness*5, r=1, center=true);
       }
   }
@@ -141,20 +155,20 @@ module plateHinge (dia, guidePlateThickness, length) {
         }
       }
     }
-    rotate(a= [180,0,0])
-    union () {
-      translate([length/2-guidePlateThickness/2,-guidePlateThickness/2,dia]) 
-      color("gray")
-      filletRadius (dia*2, guidePlateThickness/2, length);
-      translate([length/2-guidePlateThickness/2,-guidePlateThickness/2,-dia*5]) 
-      color("gray")
-      filletRadius (dia*2, guidePlateThickness/2, length);
-    }
+    // rotate(a= [180,0,0])
+    // union () {
+    //   translate([length/2-guidePlateThickness/2,-guidePlateThickness/2,dia]) 
+    //   color("gray")
+    //   filletRadius (dia*2, guidePlateThickness/2, length);
+    //   translate([length/2-guidePlateThickness/2,-guidePlateThickness/2,-dia*5]) 
+    //   color("gray")
+    //   filletRadius (dia*2, guidePlateThickness/2, length);
+    // }
   }
 }
 
 
-module woodBlock(dim = woodDimensions) {
+module woodBlock(dim = woodDims) {
   difference () {
     color ("BurlyWood")
     union () {
@@ -172,6 +186,40 @@ module woodBlock(dim = woodDimensions) {
   }
 }
 
+// backPlane();
+module backPlane (h = rodLengths[0] , woodDims = woodDims, jointThickness = jointBoltThickness*2) {
+    pd = [woodDims[0], woodDims[2]*2+woodDims[1]/2, woodDims[2], jointThickness];
+    color ("BurlyWood") 
+    union () {
+        cube ([h, woodDims[1], woodDims[2]], false);
+        rotate (a = [90, 270,0]) {
+
+            translate ([0, -h, 0])
+                supportLeg (pd);
+                
+            translate ([0, -h, -pd[0]-pd[2]]) 
+                supportLeg (pd);
+        }
+    }
+}
+
+module supportLeg (pd) {
+    difference () {
+        union () {
+            polyhedron(
+                points = [ [0, 0, 0], [pd[0], 0, 0], [pd[0], pd[3], 0], [0, pd[1], 0],
+                           [0, 0, pd[2]], [pd[0], 0, pd[2]], [pd[0], pd[3], pd[2]], [0, pd[1], pd[2]] ],
+                faces = [ [0, 1, 2, 3], [4, 5, 6, 7], //side faces
+                          [0, 1, 5, 4], [0, 3, 7, 4], [3, 2, 6, 7], [1, 2, 6, 5] ], //edge faces
+                convexity = 4);
+
+            translate ([pd[0],pd[3]/2,0])
+                cylinder (d = pd[3], h = pd[2]);
+        }
+        // translate ([pd[0],pd[3]/2,-1])
+        //     cylinder (d = pd[3]/2, h = pd[2]+2);
+    }
+}
 
 // EXAMPLE USAGE:
 // rodGuide (50, 9, 6);
@@ -216,7 +264,7 @@ module can(height, radius) {
 
 
 // EXAMPLE USAGE:
-// !roundedBox(woodDimensions, 5, true);
+// !roundedBox(woodDims, 5, true);
 
 // size is a vector [w, h, d]
 module roundedBox(size, radius, sidesonly) {
