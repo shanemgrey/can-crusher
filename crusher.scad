@@ -45,7 +45,7 @@ rods = [
 // printTop ();
 // printBottom ();
 viewOpen ();
-// viewClosed ();
+viewClosed ();
 
 module printTop () {
     guidePlate ();
@@ -62,13 +62,15 @@ module viewOpen () {
     rotate(a = [0,90,270])
     backPlane();
 
-    translate ([-woodDims[2]/2, -rodLengths[0]/2 + woodDims[1]/2, 40 + canSize[0]])
-    rotate (a=[90, 0, 90])
-    handleArm (rodLengths[0]*1.5, 20, 20, 10);
+    translate ([-woodDims[2]/2, woodDims[1]/2, woodDims[2]*2 + guidePlateThickness + jointBoltThickness + canSize[0]])
+    rotate (a=[90, 60, 90])
+    translate ([-rodLengths[0]/3, 0, 0])
+    handleArm (rodLengths[0]*2, 20, 20, 10);
 
-    translate ([woodDims[0] + woodDims[2]/2, -rodLengths[0]/2 + woodDims[1]/2, 40 + canSize[0]])
-    rotate (a=[90, 0, 90])
-    handleArm (rodLengths[0]*1.5, 20, 20, 10);
+    translate ([woodDims[0] + woodDims[2]/2, woodDims[1]/2, woodDims[2]*2 + guidePlateThickness + jointBoltThickness + canSize[0]])
+    rotate (a=[90, 60, 90])
+    translate ([-rodLengths[0]/3, 0, 0])
+    handleArm (rodLengths[0]*2, 20, 20, 10);
 
     translate ([woodDims[0]/2,woodDims[1]/2,woodDims[2]])
     can(canSize[0],canSize[1], $fn = 25);
@@ -80,14 +82,32 @@ module viewOpen () {
 }
 
 module viewClosed () {
-  canSize= ([30, 33.1]);
-    translate ([woodDims[0]/2,woodDims[1]/2,woodDims[2]])
-    can();
-    translate ([0, 0, woodDims[2] + canSize[0]])
-    plateAssembly ();
-    mirror ([0,0,1])
-    plateAssembly ();
-    rodsPositioned(rods);
+    canSize= ([30, 33.1]);
+    
+    translate ([0,(woodDims[1]*1.5),rodLengths[0]-guidePostHeight])
+    rotate(a = [0,90,270])
+    backPlane();
+
+    translate ([0, woodDims[0]/2-jointBoltThickness-guidePlateThickness , -woodDims[0]/2-jointBoltThickness-guidePlateThickness])
+    rotate (a=[90, 0, 0])
+    union () {
+        translate ([woodDims[0]/2,woodDims[1]/2,woodDims[2]])
+        can();
+        translate ([0, 0, woodDims[2] + canSize[0]])
+        plateAssembly ();
+        mirror ([0,0,1])
+        plateAssembly ();
+        rodsPositioned(rods);
+    }
+    translate ([-woodDims[2]/2, -woodDims[2], -jointBoltThickness+guidePlateThickness])
+    rotate (a=[90, -30, 90])
+    translate ([-rodLengths[0]/3, 0, 0])
+    handleArm (rodLengths[0]*2, 20, 20, 10);
+
+    translate ([woodDims[0] + woodDims[2]/2, -woodDims[2], -jointBoltThickness+guidePlateThickness])
+    rotate (a=[90, -30, 90])
+    translate ([-rodLengths[0]/3, 0, 0])
+    handleArm (rodLengths[0]*2, 20, 20, 10);
 }
 
 module plateAssembly () {
